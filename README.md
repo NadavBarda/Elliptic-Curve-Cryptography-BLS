@@ -59,4 +59,3 @@ Open your browser to `http://localhost:8000` to interact with custom configurati
 
 This implementation is intended strictly for algorithm exploration, instructional cryptography, and pairing comprehension. As a pure Python environment written transparently over basic types, it naturally trades production resistance (such as resistance to Side-Channel Attacks, Constant-time execution checks, or natively compiled extensions) for absolute formula clarity.
 
-*“Read the code, not the obfuscation!”*
