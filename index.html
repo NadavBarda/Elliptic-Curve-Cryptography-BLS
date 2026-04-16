@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BLS Cryptography Node</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        body {
+            background-color: #050505;
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(0, 5, 0, 0.85);
+            border: 1px solid #0f0;
+            box-shadow: 0 0 15px #0f0, inset 0 0 20px #0f0;
+            padding: 30px;
+            border-radius: 5px;
+            z-index: 10;
+            margin: 20px 0;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px #0f0;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            text-shadow: 0 0 5px #0f0;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            box-shadow: 0 0 15px #0f0;
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            background: transparent;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px #0f0;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0f0;
+            color: #000;
+            box-shadow: 0 0 20px #0f0, inset 0 0 0px #0f0;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .tabs {
+            display: flex;
+            margin-top: 30px;
+            border-bottom: 1px solid #0f0;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #0d0;
+            background: rgba(0, 50, 0, 0.3);
+            border: 1px solid #0f0;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+            transition: all 0.2s;
+        }
+        .tab:hover {
+            background: rgba(0, 150, 0, 0.3);
+        }
+        .tab.active {
+            background: #0f0;
+            color: #000;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #0f0;
+            border-top: none;
+            background: rgba(0, 0, 0, 0.8);
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .verified {
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 10px;
+        }
+        
+        .error {
+            color: #f00 !important;
+            text-shadow: 0 0 10px #f00 !important;
+            border-color: #f00 !important;
+            box-shadow: 0 0 15px #f00, inset 0 0 20px #f00 !important;
+        }
+
+        b {
+            color: #fff;
+            text-shadow: 0 0 5px #fff;
+        }
+        
+        .var-name {
+            color: #0ff;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    
+    <div class="container">
+        <h1>BLS Cryptography Node</h1>
+        
+        <div class="row">
+            <div class="form-group" style="flex: 2;">
+                <label>PRIME NUMBER (p):</label>
+                <input type="number" id="p_val" value="103">
+            </div>
+            
+            <div class="form-group">
+                <label>COEFF (A):</label>
+                <input type="number" id="a_val" value="1">
+            </div>
+
+            <div class="form-group">
+                <label>COEFF (B):</label>
+                <input type="number" id="b_val" value="0">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>PRIVATE KEY (x):</label>
+            <input type="number" id="priv_val" value="42">
+        </div>
+        
+        <div class="form-group">
+            <label>ALICE'S MESSAGE (m):</label>
+            <input type="text" id="msg_val" value="Follow the white rabbit...">
+        </div>
+        
+        <button onclick="verifyBLS()">Initialize Signature Verification</button>
+        
+        <div id="tabsContainer" style="display: none;">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('main')">Main Results</div>
+                <div class="tab" onclick="switchTab('intermediate')">Intermediate Data</div>
+            </div>
+            <div id="mainRes" class="tab-content active"></div>
+            <div id="intermediateRes" class="tab-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Animation
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"\'#&_(),.;:?!\\|{}<>[]^~'.split('');
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+        
+        for (let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * -100;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 40);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if(tabId === 'main') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('mainRes').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('intermediateRes').classList.add('active');
+            }
+        }
+
+        // Verification Logic
+        async function verifyBLS() {
+            document.getElementById('tabsContainer').style.display = 'block';
+            
+            // Switch to main tab automatically
+            switchTab('main');
+            
+            const mainBox = document.getElementById('mainRes');
+            const interBox = document.getElementById('intermediateRes');
+            
+            mainBox.classList.remove('error');
+            interBox.classList.remove('error');
+            interBox.innerHTML = "> Waiting for decryption node...";
+            
+            let dots = 0;
+            const loadInterval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                mainBox.innerHTML = "Establishing secure link...<br>Decrypting payload" + ".".repeat(dots);
+            }, 300);
+
+            const payload = {
+                p: document.getElementById('p_val').value,
+                a: document.getElementById('a_val').value,
+                b: document.getElementById('b_val').value,
+                priv_key: document.getElementById('priv_val').value,
+                message: document.getElementById('msg_val').value
+            };
+
+            try {
+                const response = await fetch('/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                clearInterval(loadInterval);
+                
+                if (data.error) {
+                    mainBox.classList.add('error');
+                    mainBox.innerHTML = `> [SYSTEM ERROR] ${data.error}`;
+                    interBox.innerHTML = `> [SYSTEM ERROR] Operation aborted due to critical failure.`;
+                } else {
+                    if (data.match) {
+                        mainBox.innerHTML = `
+<div class="verified">> ALICE'S MESSAGE RECEIVED AND VERIFIED <br>> e_r(x*H(m), Q) = e_r(H(m), x*Q)</div>
+
+> <b>e_r(x*H(m), Q):</b>
+  ${data.pair1}
+
+> <b>e_r(H(m), x*Q):</b>
+  ${data.pair2}
+                        `;
+                    } else {
+                        mainBox.classList.add('error');
+                        mainBox.innerHTML = `> [WARNING] SECURITY BREACH DETECTED - SIGNATURE MISMATCH!\n\nLeft: ${data.pair1}\nRight: ${data.pair2}`;
+                    }
+
+                    // Populate intermediates
+                    const i = data.intermediates;
+                    interBox.innerHTML = `
+<span class="var-name">|E(F_p)|</span>               = ${i.order_Fp}
+<span class="var-name">|E(F_p^k)|</span>             = ${i.order_Fpk}
+<span class="var-name">r</span>                      = ${i.r}
+<span class="var-name">k</span>                      = ${i.k}
+<span class="var-name">co-factor</span>              = ${i.cofactor}
+<span class="var-name">x (before mod p)</span>       = ${i.x_pre}
+<span class="var-name">x (after mod p)</span>        = ${i.x_post}
+
+<span class="var-name">P_temp</span>                 = ${i.P_temp}
+<span class="var-name">H(m)</span>                   = ${i.H_m}
+<span class="var-name">sigma (x * H(m))</span>       = ${i.sigma}
+<span class="var-name">Q</span>                      = ${i.Q}
+
+<span class="var-name">f(x) (irreduc. poly)</span>   = ${i.f_x}
+                    `;
+                }
+            } catch (err) {
+                clearInterval(loadInterval);
+                mainBox.classList.add('error');
+                mainBox.innerHTML = "> [CRITICAL FAILURE] Unable to contact the verification node.";
+                interBox.innerHTML = "> Offline.";
+            }
+        }
+    </script>
+</body>
+</html>
